@@ -1,14 +1,17 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 // import * as sns from 'aws-cdk-lib/aws-sns';
 // import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { HitCounter } from './hitcounter';
 
 export class CdkTemplateStack extends Stack {
+  public readonly hcEndpointUrl: cdk.CfnOutput;
+
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -32,6 +35,10 @@ export class CdkTemplateStack extends Stack {
 
     const lamdaEndpoint = new apigw.LambdaRestApi(this, 'HelloHandlerGateway', {
       handler: hitCounter.handler
+    });
+
+    this.hcEndpointUrl = new cdk.CfnOutput(this, 'GatewayUrl', {
+      value: lamdaEndpoint.url
     });
 
     // -=-=-=-=-=-=-=-=-
