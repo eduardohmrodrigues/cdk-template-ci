@@ -17,7 +17,7 @@ export class PipelineStack extends cdk.Stack {
         // of our pipeline
         const pipeline = new CodePipeline(this, 'TemplatePipeline', {
             pipelineName: 'TemplatePipeline',
-            synth: new CodeBuildStep('Synth Step', {
+            synth: new CodeBuildStep('SynthStep', {
                 input: CodePipelineSource.codeCommit(repo, 'main'),
                 installCommands: [
                     'sudo npm install -g npm@9.6.2',
@@ -26,6 +26,7 @@ export class PipelineStack extends cdk.Stack {
                 commands: [
                     'npm ci',
                     'npm run build',
+                    'npm run test',
                     'npx cdk synth'
                 ]
             })
