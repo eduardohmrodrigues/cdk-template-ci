@@ -1,3 +1,4 @@
+import * as cdk from 'aws-cdk-lib';
 import { CdkTemplateStack } from "./cdk-template-stack";
 import { Stage, StageProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
