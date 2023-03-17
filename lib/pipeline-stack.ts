@@ -42,8 +42,8 @@ export class PipelineStack extends cdk.Stack {
                     ENDPOINT_URL: deploy.hcEndpointUrl
                 },
                 commands: [
-                    'cursl -Ssf $ENDPOINT_URL',
-                    'cursl -Ssf $ENDPOINT_URL/hello'
+                    'curl -Ssf $ENDPOINT_URL',
+                    'curl -Ssf $ENDPOINT_URL/hello'
                 ]
             })
         );
