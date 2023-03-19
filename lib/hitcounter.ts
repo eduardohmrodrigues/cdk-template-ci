@@ -1,7 +1,9 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import {Effect, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import { NagSuppressions } from 'cdk-nag';
 
 export interface HitCounterProps {
     /** the function for which we want to count url hits **/
@@ -29,6 +31,18 @@ export class HitCounter extends Construct {
             roleName: 'HitCounterRole'
         });
 
+        lambdaRole.addToPolicy(
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: [
+                    'logs:CreateLogGroup',
+                    'logs:CreateLogStream',
+                    'logs:PutLogEvents'
+                ],
+                resources: ['*'],
+            })
+        )
+
         this.table = new dynamodb.Table(this, 'HitcounterDDB', {
             tableName: props.tableName,
             partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING },
@@ -51,5 +65,16 @@ export class HitCounter extends Construct {
         });
 
         props.downstream.grantInvoke(lambdaRole);
+
+        NagSuppressions.addResourceSuppressions(
+            lambdaRole,
+            [
+                {
+                    id: 'AwsSolutions-IAM5',
+                    reason: 'Suppress all AwsSolutions-IAM5 findings on IAM Role.',
+                },
+            ],
+            true
+        );
     }
 }
