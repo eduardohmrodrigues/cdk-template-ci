@@ -18,7 +18,7 @@ export class TodoConstruct extends Construct {
         const dbName = 'TestDB';
         const cluster = new ServerlessCluster(this, 'AuroraTestCluster', {
             engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
-            parameterGroup: ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', 'default.aurora-postgresql15'),
+            parameterGroup: ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', 'default.aurora-postgresql14'),
             defaultDatabaseName: dbName,
             vpc,
             scaling: { autoPause: Duration.seconds(0) }
