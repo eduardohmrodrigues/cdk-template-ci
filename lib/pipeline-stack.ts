@@ -8,17 +8,16 @@ export class PipelineStack extends cdk.Stack {
     constructor(scope: Construct, id: string, props?: cdk.StackProps) {
         super(scope, id);
 
-        // This creates a new CodeCommit repository called 'CdkTemplateRepo'
-        const repo = new codecommit.Repository(this, 'CdkTemplateRepo', {
-            repositoryName: "CdkTemplateRepo"
-        });
-
         // The basic pipeline declaration. This sets the initial structure
         // of our pipeline
         const pipeline = new CodePipeline(this, 'TemplatePipeline', {
             pipelineName: 'TemplatePipeline',
             synth: new CodeBuildStep('SynthStep', {
-                input: CodePipelineSource.codeCommit(repo, 'main'),
+                input: CodePipelineSource.connection(
+                    'eduardohmrodrigues/cdk-template-ci', 
+                    'main', {
+                        connectionArn: 'arn:aws:codestar-connections:us-east-1:537580096116:connection/97c3920e-2897-42f7-b041-e75c99509884'
+                    }),
                 installCommands: [
                     'sudo npm install -g npm@9.6.2',
                     'npm install -g aws-cdk'
