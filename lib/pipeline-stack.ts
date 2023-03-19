@@ -19,7 +19,8 @@ export class PipelineStack extends cdk.Stack {
                     }),
                 installCommands: [
                     'sudo npm install -g npm@9.6.2',
-                    'npm install -g aws-cdk'
+                    'npm install -g aws-cdk',
+                    'npm install -g data-api-client uuid'
                 ],
                 commands: [
                     'npm ci',

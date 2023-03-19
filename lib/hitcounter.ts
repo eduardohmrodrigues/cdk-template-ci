@@ -1,4 +1,3 @@
-import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as iam from 'aws-cdk-lib/aws-iam';
@@ -8,7 +7,6 @@ export interface HitCounterProps {
     /** the function for which we want to count url hits **/
     downstream: lambda.IFunction;
     tableName?: string;
-    lambdaRole: iam.Role;
     readCapacity?: number;
 }
 
@@ -25,6 +23,12 @@ export class HitCounter extends Construct {
 
         super(scope, id);
 
+        const lambdaRole = new iam.Role(this, 'lambda-iam-role', {
+            assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+            description: 'Role to grant permissions to the lamda function',
+            roleName: 'HitCounterRole'
+        });
+
         this.table = new dynamodb.Table(this, 'HitcounterDDB', {
             tableName: props.tableName,
             partitionKey: { name: 'path', type: dynamodb.AttributeType.STRING },
@@ -33,19 +37,19 @@ export class HitCounter extends Construct {
             // removalPolicy: cdk.RemovalPolicy.DESTROY
         });
 
-        this.table.grantReadWriteData(props.lambdaRole);
+        this.table.grantReadWriteData(lambdaRole);
 
         this.handler = new lambda.Function(this, 'HitcounterHandler', {
             runtime: lambda.Runtime.NODEJS_14_X,
-            handler: 'hitcounter.handler',
+            handler: 'hello-dynamo.handler',
             code: lambda.Code.fromAsset('lambda'),
             environment: {
                 DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
                 HITS_TABLE_NAME: this.table.tableName
             },
-            role: props.lambdaRole,
+            role: lambdaRole,
         });
 
-        props.downstream.grantInvoke(props.lambdaRole);
+        props.downstream.grantInvoke(lambdaRole);
     }
 }
