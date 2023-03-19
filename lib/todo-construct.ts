@@ -1,6 +1,6 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
-import { DatabaseClusterEngine, ParameterGroup, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
+import { AuroraPostgresEngineVersion, DatabaseClusterEngine, ParameterGroup, ServerlessCluster } from 'aws-cdk-lib/aws-rds';
 import { Duration, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 
@@ -16,9 +16,10 @@ export class TodoConstruct extends Construct {
         const vpc = new Vpc(this, 'AuroraVPC');
 
         const dbName = 'TestDB';
+        const postgresVersion = AuroraPostgresEngineVersion.VER_10_16.auroraPostgresMajorVersion.split(".")[0];
         const cluster = new ServerlessCluster(this, 'AuroraTestCluster', {
             engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
-            parameterGroup: ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', 'default.aurora-postgresql14'),
+            parameterGroup: ParameterGroup.fromParameterGroupName(this, 'ParameterGroup', `default.aurora-postgresql${postgresVersion}`),
             defaultDatabaseName: dbName,
             vpc,
             scaling: { autoPause: Duration.seconds(0) }
